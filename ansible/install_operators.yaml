@@ -108,7 +108,7 @@
 
     - name: Wait for rhsi-operator to be running
       shell:
-        cmd: oc get pods -n openshift-operators | grep skupper-controller | grep Running
+        cmd: oc get pods -n openshift-operators | grep skupper-site-controller | grep Running
       register: rhsi_result
       until: rhsi_result.rc == 0
       retries: 30
