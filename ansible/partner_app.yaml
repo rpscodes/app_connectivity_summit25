@@ -16,22 +16,6 @@
         cmd: oc new-project blue-portal --skip-config-write=true || true
       register: blue_portal_project
 
-    ###############################################
-    # Enable istio-injection for namespace
-    ###############################################
-    - name: Enable istio-injection for blue-portal namespace
-      shell:
-        cmd: kubectl label namespace blue-portal istio-injection=enabled --overwrite
-      register: label_blue_portal_result
-
-    ###############################################
-    # Apply pod monitor to namespace
-    ###############################################
-    - name: Apply pod monitor to blue-portal namespace
-      k8s:
-        state: present
-        src: ../resources/Monitoring/podMonitor.yaml
-        namespace: blue-portal
 
     ###############################################
     # Deploy partner application

@@ -148,34 +148,7 @@
         cmd: oc apply -k ../resources/gateway
       register: gateway_result
       
-    ###############################################
-    # Create ingress gateway via Istio Deployment
-    ###############################################
-    - name: Install Istio Ingress Gateway
-      k8s:
-        state: present
-        src: ../resources/OSSM3/istioIngressGateway.yaml
-        namespace: istio-ingress
-        
-    - name: Wait for deployment/istio-ingressgateway to become available
-      shell:
-        cmd: oc wait --for condition=Available deployment/istio-ingressgateway --timeout 60s -n istio-ingress
-      register: ingress_deployment_result
-      
-    - name: Expose Istio ingress route
-      k8s:
-        state: present
-        api_version: route.openshift.io/v1
-        kind: Route
-        name: istio-ingressgateway
-        namespace: istio-ingress
-        resource_definition:
-          spec:
-            port:
-              targetPort: http2
-            to:
-              kind: Service
-              name: istio-ingressgateway
+   
             
     ###############################################
     # Enable monitoring
@@ -247,78 +220,23 @@
         src: ../resources/Kiali/kialiOssmcCr.yaml
         namespace: istio-system
         
-    ###############################################
-    # Install Sample RestAPI
-    ###############################################
-    - name: Install Sample RestAPI
-      shell:
-        cmd: oc apply -k ../resources/application/kustomize/overlays/pod
-      register: sample_api_result
+    
       
     ###############################################
-    # Install Bookinfo
+    # Set display info
     ###############################################
-    - name: Create bookinfo project
-      shell:
-        cmd: oc new-project bookinfo --skip-config-write=true || true
-        
-    - name: Add bookinfo namespace as part of the mesh
-      shell:
-        cmd: oc label namespace bookinfo istio-injection=enabled --overwrite
-      register: label_bookinfo_result
-      
-    - name: Enable pod monitor in bookinfo namespace
-      k8s:
-        state: present
-        src: ../resources/Monitoring/podMonitor.yaml
-        namespace: bookinfo
-        
-    - name: Install Bookinfo application
-      k8s:
-        state: present
-        src: ../resources/Bookinfo/bookinfo.yaml
-        namespace: bookinfo
-        
-    - name: Install Bookinfo gateway
-      k8s:
-        state: present
-        src: ../resources/Bookinfo/bookinfo-gateway.yaml
-        namespace: bookinfo
-        
-    - name: Wait for bookinfo pods to become ready
-      shell:
-        cmd: oc wait --for=condition=Ready pods --all -n bookinfo --timeout 60s
-      register: bookinfo_pods_result
-      
-    ###############################################
-    # Set up traffic generator and display info
-    ###############################################
-    - name: Get Ingress Host
-      shell:
-        cmd: oc get route istio-ingressgateway -n istio-ingress -o=jsonpath='{.spec.host}'
-      register: ingress_host
+
       
     - name: Get Kiali Host
       shell:
         cmd: oc get route kiali -n istio-system -o=jsonpath='{.spec.host}'
       register: kiali_host
       
-    - name: Install Bookinfo traffic generator config
-      shell:
-        cmd: "cat ../resources/Bookinfo/traffic-generator-configmap.yaml | ROUTE='http://{{ ingress_host.stdout }}/productpage' envsubst | oc -n bookinfo apply -f -"
-      register: traffic_config_result
-      
-    - name: Install Bookinfo traffic generator
-      k8s:
-        state: present
-        src: ../resources/Bookinfo/traffic-generator.yaml
-        namespace: bookinfo
+
         
     - name: Display final information
       debug:
         msg:
           - "===================================================================================================="
-          - "Ingress route for bookinfo is: http://{{ ingress_host.stdout }}/productpage"
-          - "To test RestAPI: sh ./scripts/test-api.sh"
           - "Kiali route is: https://{{ kiali_host.stdout }}"
           - "===================================================================================================="

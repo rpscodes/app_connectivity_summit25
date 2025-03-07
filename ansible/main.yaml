@@ -1,12 +1,12 @@
 ---
-# Import operators installation playbook
+# # Import operators installation playbook
 - import_playbook: install_operators.yaml
 
-# Import OSSM3 demo installation playbook
+# # Import OSSM3 demo installation playbook
 - import_playbook: install_ossm3_demo.yaml
 
-# Import travel app workload playbook
+# # Import travel app workload playbook
 - import_playbook: workload_app.yaml
 
-# Import travel app workload playbook
+# # Import travel app workload playbook
 - import_playbook: partner_app.yaml
