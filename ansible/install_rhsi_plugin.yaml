@@ -1,0 +1,35 @@
+---
+# Playbook to apply Kubernetes manifest and patch OpenShift console
+- name: Kubernetes Operations
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  tasks:
+    - name: Apply Kubernetes manifest
+      k8s:
+        state: present
+        src: ../resources/RHSI/site-plugin-manifest.yaml
+      register: manifest_result
+    
+    - name: Display manifest application result
+      debug:
+        var: manifest_result
+        verbosity: 1
+    
+    - name: Patch OpenShift console to enable plugins
+      k8s:
+        api_version: operator.openshift.io/v1
+        kind: Console
+        name: cluster
+        merge_type: merge
+        definition:
+          spec:
+            plugins:
+              - openshift-site-plugin
+      register: patch_result
+    
+    - name: Display patch result
+      debug:
+        var: patch_result
+        verbosity: 1

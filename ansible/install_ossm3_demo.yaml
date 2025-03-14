@@ -134,19 +134,19 @@
     ###############################################
     # Create ingress gateway via Gateway API
     ###############################################
-    - name: Create istio-ingress project
-      shell:
-        cmd: oc new-project istio-ingress --skip-config-write=true || true
+    # - name: Create istio-ingress project
+    #   shell:
+    #     cmd: oc new-project istio-ingress --skip-config-write=true || true
         
-    - name: Add istio-ingress namespace as part of the mesh
-      shell:
-        cmd: oc label namespace istio-ingress istio-injection=enabled --overwrite
-      register: label_ingress_result
+    # - name: Add istio-ingress namespace as part of the mesh
+    #   shell:
+    #     cmd: oc label namespace istio-ingress istio-injection=enabled --overwrite
+    #   register: label_ingress_result
       
-    - name: Apply gateway configuration
-      shell:
-        cmd: oc apply -k ../resources/gateway
-      register: gateway_result
+    # - name: Apply gateway configuration
+    #   shell:
+    #     cmd: oc apply -k ../resources/gateway
+    #   register: gateway_result
       
    
             
@@ -170,11 +170,11 @@
         src: ../resources/Monitoring/podMonitor.yaml
         namespace: istio-system
         
-    - name: Enable pod monitor in istio-ingress namespace
-      k8s:
-        state: present
-        src: ../resources/Monitoring/podMonitor.yaml
-        namespace: istio-ingress
+    # - name: Enable pod monitor in istio-ingress namespace
+    #   k8s:
+    #     state: present
+    #     src: ../resources/Monitoring/podMonitor.yaml
+    #     namespace: istio-ingress
         
     ###############################################
     # Install Kiali
