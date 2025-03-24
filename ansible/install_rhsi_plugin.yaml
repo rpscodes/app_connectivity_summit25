@@ -17,19 +17,29 @@
         var: manifest_result
         verbosity: 1
     
-    - name: Patch OpenShift console to enable plugins
+    - name: Get current console configuration
+      k8s_info:
+        api_version: operator.openshift.io/v1
+        kind: Console
+        name: cluster
+      register: console_info
+
+    - name: Set fact for combined plugins
+      set_fact:
+        combined_plugins: "{{ (console_info.resources[0].spec.plugins | default([])) + ['kuadrant-console-plugin', 'openshift-site-plugin'] | unique }}"
+
+    - name: Update console with combined plugins
       k8s:
+        state: present
         api_version: operator.openshift.io/v1
         kind: Console
         name: cluster
         merge_type: merge
         definition:
           spec:
-            plugins:
-              - openshift-site-plugin
-      register: patch_result
+            plugins: "{{ combined_plugins }}"
     
-    - name: Display patch result
-      debug:
-        var: patch_result
-        verbosity: 1
+    # - name: Display patch result
+    #   debug:
+    #     var: patch_result
+    #     verbosity: 1
