@@ -13,3 +13,6 @@
 
 # Import travel app workload playbook
 - import_playbook: partner_app.yaml
+
+# Import travel app workload playbook
+- import_playbook: devspaces.yaml
