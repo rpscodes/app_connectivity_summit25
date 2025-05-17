@@ -9,6 +9,8 @@ sleep 20
 oc apply -f https://raw.githubusercontent.com/rpscodes/app_connectivity_summit25/refs/heads/main/.ansible/demo_scripts/grant.yaml
 sleep 20
 
+oc apply -f https://raw.githubusercontent.com/app-connectivity-workshop/scripts/refs/heads/main/m1/network_console_deploy.yaml -n travel-db
+sleep 20
 
 oc label namespace travel-agency istio-injection=enabled --overwrite=true
 sleep 30
